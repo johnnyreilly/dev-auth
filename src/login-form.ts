@@ -5,12 +5,12 @@ export function loginFormHtml(
 	cookieName: string,
 	defaultUser?: ClientPrincipal,
 ): string {
-	const d = defaultUser ?? {
-		identityProvider: provider,
-		userId: crypto.randomUUID(),
-		userDetails: "",
-		userRoles: ["anonymous", "authenticated"],
-		claims: [],
+	const d: ClientPrincipal = {
+		identityProvider: defaultUser?.identityProvider ?? provider,
+		userId: defaultUser?.userId ?? crypto.randomUUID(),
+		userDetails: defaultUser?.userDetails ?? "",
+		userRoles: defaultUser?.userRoles ?? ["anonymous", "authenticated"],
+		claims: defaultUser?.claims ?? [],
 	};
 
 	const rolesValue = d.userRoles.join("\n");
