@@ -24,7 +24,8 @@ function probe(
 	url: string,
 ): Promise<boolean> {
 	return new Promise((resolve) => {
-		const req = client.get(url, { timeout: 1000 }, () => {
+		const req = client.get(url, { timeout: 1000 }, (res) => {
+			res.resume();
 			resolve(true);
 		});
 		req.on("error", () => {
