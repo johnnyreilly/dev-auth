@@ -82,11 +82,7 @@ const backend =
 let port: number;
 if (values.port !== undefined) {
 	const parsedPort = Number.parseInt(values.port, 10);
-	if (
-		!Number.isFinite(parsedPort) ||
-		parsedPort < 1 ||
-		parsedPort > 65535
-	) {
+	if (!Number.isFinite(parsedPort) || parsedPort < 1 || parsedPort > 65535) {
 		console.error(
 			`Error: invalid port "${values.port}". Port must be an integer between 1 and 65535.`,
 		);
@@ -103,7 +99,7 @@ if (values["devserver-timeout"] !== undefined) {
 	const parsed = parseInt(values["devserver-timeout"], 10);
 	if (!Number.isFinite(parsed) || parsed < 0) {
 		console.error(
-			'Error: invalid value for --devserver-timeout; expected a non-negative integer.',
+			"Error: invalid value for --devserver-timeout; expected a non-negative integer.",
 		);
 		process.exit(1);
 	}
