@@ -79,10 +79,23 @@ const fileConfig = loadConfigFile(values.config);
 // --backend and --app-devserver-url / -D are aliases; CLI flags take precedence over config file
 const backend =
 	values.backend ?? values["app-devserver-url"] ?? fileConfig.backend;
-const port =
-	values.port !== undefined
-		? parseInt(values.port, 10)
-		: (fileConfig.port ?? 4280);
+let port: number;
+if (values.port !== undefined) {
+	const parsedPort = Number.parseInt(values.port, 10);
+	if (
+		!Number.isFinite(parsedPort) ||
+		parsedPort < 1 ||
+		parsedPort > 65535
+	) {
+		console.error(
+			`Error: invalid port "${values.port}". Port must be an integer between 1 and 65535.`,
+		);
+		process.exit(1);
+	}
+	port = parsedPort;
+} else {
+	port = fileConfig.port ?? 4280;
+}
 const host = values.host ?? fileConfig.host ?? "localhost";
 const openBrowser = values.open || (fileConfig.open ?? false);
 const devserverTimeout =
