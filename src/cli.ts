@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawn } from "node:child_process";
 import { parseArgs } from "node:util";
+import { fileURLToPath } from "node:url";
 
 import { DEV_AUTH_COOKIE_NAME, SWA_COOKIE_NAME } from "./cookie.js";
 import { startServer } from "./server.js";
@@ -30,27 +31,6 @@ const HELP = `
     $ dev-auth --run "npm start" --backend http://localhost:3000 --devserver-timeout 30
     $ dev-auth -D http://localhost:5173 --open
 `;
-
-const { values } = parseArgs({
-	args: process.argv.slice(2),
-	options: {
-		backend: { type: "string", short: "b" },
-		"app-devserver-url": { type: "string", short: "D" },
-		port: { type: "string", short: "p" },
-		host: { type: "string", short: "q" },
-		open: { type: "boolean", short: "o", default: false },
-		run: { type: "string", short: "r" },
-		"devserver-timeout": { type: "string", short: "t" },
-		config: { type: "string", short: "c", default: "dev-auth.json" },
-		swa: { type: "boolean", default: false },
-		help: { type: "boolean", short: "h", default: false },
-	},
-});
-
-if (values.help) {
-	process.stdout.write(HELP);
-	process.exit(0);
-}
 
 interface ConfigFile {
 	backend?: string;
@@ -89,41 +69,62 @@ function parseIntOption(
 	return n;
 }
 
-const fileConfig = loadConfigFile(values.config);
-
-// --backend and --app-devserver-url / -D are aliases; CLI flags take precedence over config file
-const backend =
-	values.backend ?? values["app-devserver-url"] ?? fileConfig.backend;
-const port =
-	values.port !== undefined
-		? parseIntOption(values.port, "--port", 1, 65535)
-		: (fileConfig.port ?? 4280);
-const host = values.host ?? fileConfig.host ?? "localhost";
-const openBrowser = values.open || (fileConfig.open ?? false);
-const devserverTimeout =
-	values["devserver-timeout"] !== undefined
-		? parseIntOption(values["devserver-timeout"], "--devserver-timeout", 0)
-		: (fileConfig.devserverTimeout ?? 60);
-
-if (!backend) {
-	console.error(
-		"Error: no backend URL specified.\n" +
-			'Use --backend <url> (or -D / --app-devserver-url) or set "backend" in dev-auth.json.',
-	);
-	process.exit(1);
-}
-
-const config: Config = {
-	backend,
-	port,
-	host,
-	open: openBrowser,
-	devserverTimeout,
-	cookieName: values.swa ? SWA_COOKIE_NAME : DEV_AUTH_COOKIE_NAME,
-	defaultUser: fileConfig.defaultUser,
-};
-
 async function main(): Promise<void> {
+	const { values } = parseArgs({
+		args: process.argv.slice(2),
+		options: {
+			backend: { type: "string", short: "b" },
+			"app-devserver-url": { type: "string", short: "D" },
+			port: { type: "string", short: "p" },
+			host: { type: "string", short: "q" },
+			open: { type: "boolean", short: "o", default: false },
+			run: { type: "string", short: "r" },
+			"devserver-timeout": { type: "string", short: "t" },
+			config: { type: "string", short: "c", default: "dev-auth.json" },
+			swa: { type: "boolean", default: false },
+			help: { type: "boolean", short: "h", default: false },
+		},
+	});
+
+	if (values.help) {
+		process.stdout.write(HELP);
+		process.exit(0);
+	}
+
+	const fileConfig = loadConfigFile(values.config);
+
+	// --backend and --app-devserver-url / -D are aliases; CLI flags take precedence over config file
+	const backend =
+		values.backend ?? values["app-devserver-url"] ?? fileConfig.backend;
+	const port =
+		values.port !== undefined
+			? parseIntOption(values.port, "--port", 1, 65535)
+			: (fileConfig.port ?? 4280);
+	const host = values.host ?? fileConfig.host ?? "localhost";
+	const openBrowser = values.open || (fileConfig.open ?? false);
+	const devserverTimeout =
+		values["devserver-timeout"] !== undefined
+			? parseIntOption(values["devserver-timeout"], "--devserver-timeout", 0)
+			: (fileConfig.devserverTimeout ?? 60);
+
+	if (!backend) {
+		console.error(
+			"Error: no backend URL specified.\n" +
+				'Use --backend <url> (or -D / --app-devserver-url) or set "backend" in dev-auth.json.',
+		);
+		process.exit(1);
+	}
+
+	const config: Config = {
+		backend,
+		port,
+		host,
+		open: openBrowser,
+		devserverTimeout,
+		cookieName: values.swa ? SWA_COOKIE_NAME : DEV_AUTH_COOKIE_NAME,
+		defaultUser: fileConfig.defaultUser,
+	};
+
 	if (values.run) {
 		console.log(`Running: ${values.run}`);
 		const child = spawn(values.run, {
@@ -152,7 +153,9 @@ async function main(): Promise<void> {
 	startServer(config);
 }
 
-main().catch((err: unknown) => {
-	console.error(err);
-	process.exit(1);
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+	main().catch((err: unknown) => {
+		console.error(err);
+		process.exit(1);
+	});
+}
