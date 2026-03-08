@@ -24,16 +24,28 @@ function probe(
 	url: string,
 ): Promise<boolean> {
 	return new Promise((resolve) => {
+		let settled = false;
+		const done = (value: boolean) => {
+			if (settled) return;
+			settled = true;
+			resolve(value);
+		};
+
 		const req = client.get(url, { timeout: 1000 }, (res) => {
+			res.on("end", () => {
+				done(true);
+			});
+			res.on("error", () => {
+				done(false);
+			});
 			res.resume();
-			resolve(true);
 		});
 		req.on("error", () => {
-			resolve(false);
+			done(false);
 		});
 		req.on("timeout", () => {
 			req.destroy();
-			resolve(false);
+			done(false);
 		});
 	});
 }
