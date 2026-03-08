@@ -38,7 +38,7 @@ Note: Run `pnpm build` before `pnpm lint` — some lint rules check the built ou
 
 ### Key files
 
-- `src/cli.ts` — CLI entry point; parses flags with `meow`, loads `dev-auth.json`, optionally spawns `--run` subprocess, waits for backend, calls `startServer()`
+- `src/cli.ts` — CLI entry point; parses flags with Node's `parseArgs` (`node:util`), loads `dev-auth.json`, optionally spawns `--run` subprocess, waits for backend, calls `startServer()`
 - `src/server.ts` — `http.createServer()` router; delegates to route handlers or proxies via `httpxy`; opens browser if `--open`
 - `src/wait-for-backend.ts` — polls a URL until it responds or timeout expires
 - `src/cookie.ts` — encode/decode `StaticWebAppsAuthCookie` (plain base64 JSON, no encryption)
