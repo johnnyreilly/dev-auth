@@ -25,7 +25,7 @@ pnpm run test src/cookie.test.ts
 After all code changes, run in this order:
 
 ```shell
-pnpm tsc && pnpm lint && pnpm run test && pnpm run build
+pnpm tsc && pnpm build && pnpm lint && pnpm run test
 ```
 
 Note: Run `pnpm build` before `pnpm lint` — some lint rules check the built output in `lib/`.
