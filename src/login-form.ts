@@ -104,7 +104,12 @@ export function loginFormHtml(
         var claimsRaw = form.claims.value.trim();
         var claims = [];
         if (claimsRaw) {
-          try { claims = JSON.parse(claimsRaw); } catch (_) {
+          try {
+            claims = JSON.parse(claimsRaw);
+            if (!Array.isArray(claims)) {
+              throw new Error("Claims must be a JSON array");
+            }
+          } catch (_) {
             document.getElementById("claims-error").style.display = "block";
             return;
           }
