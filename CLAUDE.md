@@ -34,7 +34,7 @@ Note: Run `pnpm build` before `pnpm lint` — some lint rules check the built ou
 
 `dev-auth` is a Node.js CLI tool that emulates the auth layer of the Azure Static Web Apps CLI. It listens on port 4280 (default), handles `/.auth/*` routes locally, and reverse-proxies all other traffic to a backend dev server.
 
-**Source (`src/`) → built output (`lib/`)** via tsdown with `unbundle: true` (one output file per source file). The CLI binary is `lib/cli.js`, registered in `package.json` under `"bin"`.
+**Source (`src/`) → built output (`lib/`)** via tsdown with `unbundle: true` (one output file per source file). The CLI binary is `./lib/start.js`, registered in `package.json` under `"bin"`.
 
 ### Key files
 
