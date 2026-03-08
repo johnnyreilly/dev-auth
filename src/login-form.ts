@@ -128,7 +128,13 @@ export function loginFormHtml(
           claims: claims,
         };
 
-        var encoded = btoa(JSON.stringify(principal));
+        var principalJson = JSON.stringify(principal);
+        var utf8Bytes = new TextEncoder().encode(principalJson);
+        var binary = "";
+        for (var i = 0; i < utf8Bytes.length; i++) {
+          binary += String.fromCharCode(utf8Bytes[i]);
+        }
+        var encoded = btoa(binary);
         document.cookie = "${cookieName}=" + encoded + "; path=/";
         window.location.href = redirectUri;
       });
