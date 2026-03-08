@@ -3,7 +3,9 @@ import type { ClientPrincipal } from "./types.js";
 export const SWA_COOKIE_NAME = "StaticWebAppsAuthCookie";
 export const DEV_AUTH_COOKIE_NAME = "dev-auth-cookie";
 
-export function parseCookies(header: string | undefined): Record<string, string> {
+export function parseCookies(
+	header: string | undefined,
+): Record<string, string> {
 	if (!header) return {};
 	return Object.fromEntries(
 		header.split(";").map((part) => {

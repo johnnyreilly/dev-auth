@@ -79,7 +79,10 @@ const fileConfig = loadConfigFile(values.config);
 // --backend and --app-devserver-url / -D are aliases; CLI flags take precedence over config file
 const backend =
 	values.backend ?? values["app-devserver-url"] ?? fileConfig.backend;
-const port = values.port !== undefined ? parseInt(values.port, 10) : (fileConfig.port ?? 4280);
+const port =
+	values.port !== undefined
+		? parseInt(values.port, 10)
+		: (fileConfig.port ?? 4280);
 const host = values.host ?? fileConfig.host ?? "localhost";
 const openBrowser = values.open || (fileConfig.open ?? false);
 const devserverTimeout =

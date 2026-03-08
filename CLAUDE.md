@@ -15,6 +15,7 @@ pnpm run test --coverage  # Run tests with coverage report in coverage/
 ```
 
 Run a single test file:
+
 ```shell
 pnpm run test src/cookie.test.ts
 ```
@@ -22,6 +23,7 @@ pnpm run test src/cookie.test.ts
 **IMPORTANT**
 
 After all code changes, run in this order:
+
 ```shell
 pnpm tsc && pnpm lint && pnpm run test && pnpm run build
 ```
@@ -58,32 +60,32 @@ Note: Run `pnpm build` before `pnpm lint` — some lint rules check the built ou
 
 All flags can also be set in `dev-auth.json`. CLI flags override config file values.
 
-| Flag | Alias | Default | Description |
-|------|-------|---------|-------------|
-| `--backend` | `-b`, `--app-devserver-url`, `-D` | — | Backend URL to proxy to (required) |
-| `--port` | `-p` | `4280` | Port to listen on |
-| `--host` | `-q` | `localhost` | Host address to bind to |
-| `--open` | `-o` | `false` | Open browser on startup |
-| `--run` | `-r` | — | Shell command to spawn at startup |
-| `--devserver-timeout` | `-t` | `60` | Seconds to wait for backend to be ready |
-| `--config` | `-c` | `dev-auth.json` | Path to config file |
+| Flag                  | Alias                             | Default         | Description                             |
+| --------------------- | --------------------------------- | --------------- | --------------------------------------- |
+| `--backend`           | `-b`, `--app-devserver-url`, `-D` | —               | Backend URL to proxy to (required)      |
+| `--port`              | `-p`                              | `4280`          | Port to listen on                       |
+| `--host`              | `-q`                              | `localhost`     | Host address to bind to                 |
+| `--open`              | `-o`                              | `false`         | Open browser on startup                 |
+| `--run`               | `-r`                              | —               | Shell command to spawn at startup       |
+| `--devserver-timeout` | `-t`                              | `60`            | Seconds to wait for backend to be ready |
+| `--config`            | `-c`                              | `dev-auth.json` | Path to config file                     |
 
 ### Config file (`dev-auth.json`)
 
 ```json
 {
-  "backend": "http://localhost:3000",
-  "port": 4280,
-  "host": "localhost",
-  "open": false,
-  "devserverTimeout": 60,
-  "defaultUser": {
-    "identityProvider": "aad",
-    "userId": "a3c9a2c0-0000-0000-0000-000000000000",
-    "userDetails": "user@example.com",
-    "userRoles": ["anonymous", "authenticated"],
-    "claims": []
-  }
+	"backend": "http://localhost:3000",
+	"port": 4280,
+	"host": "localhost",
+	"open": false,
+	"devserverTimeout": 60,
+	"defaultUser": {
+		"identityProvider": "aad",
+		"userId": "a3c9a2c0-0000-0000-0000-000000000000",
+		"userDetails": "user@example.com",
+		"userRoles": ["anonymous", "authenticated"],
+		"claims": []
+	}
 }
 ```
 

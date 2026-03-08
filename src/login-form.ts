@@ -1,6 +1,10 @@
 import type { DefaultUser } from "./types.js";
 
-export function loginFormHtml(provider: string, cookieName: string, defaultUser?: DefaultUser): string {
+export function loginFormHtml(
+	provider: string,
+	cookieName: string,
+	defaultUser?: DefaultUser,
+): string {
 	const d = defaultUser ?? {
 		identityProvider: provider,
 		userId: crypto.randomUUID(),
@@ -10,7 +14,8 @@ export function loginFormHtml(provider: string, cookieName: string, defaultUser?
 	};
 
 	const rolesValue = d.userRoles.join("\n");
-	const claimsValue = d.claims.length > 0 ? JSON.stringify(d.claims, null, 2) : "";
+	const claimsValue =
+		d.claims.length > 0 ? JSON.stringify(d.claims, null, 2) : "";
 
 	return `<!DOCTYPE html>
 <html lang="en">

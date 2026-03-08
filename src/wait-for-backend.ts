@@ -1,7 +1,10 @@
 import http from "node:http";
 import https from "node:https";
 
-export async function waitForBackend(url: string, timeoutSeconds: number): Promise<void> {
+export async function waitForBackend(
+	url: string,
+	timeoutSeconds: number,
+): Promise<void> {
 	const deadline = Date.now() + timeoutSeconds * 1000;
 	const client = url.startsWith("https") ? https : http;
 
@@ -16,7 +19,10 @@ export async function waitForBackend(url: string, timeoutSeconds: number): Promi
 	);
 }
 
-function probe(client: typeof http | typeof https, url: string): Promise<boolean> {
+function probe(
+	client: typeof http | typeof https,
+	url: string,
+): Promise<boolean> {
 	return new Promise((resolve) => {
 		const req = client.get(url, { timeout: 1000 }, () => {
 			resolve(true);

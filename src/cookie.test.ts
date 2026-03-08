@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { DEV_AUTH_COOKIE_NAME, SWA_COOKIE_NAME, decodePrincipal, encodePrincipal, getAuthCookie, parseCookies } from "./cookie.js";
+import {
+	DEV_AUTH_COOKIE_NAME,
+	SWA_COOKIE_NAME,
+	decodePrincipal,
+	encodePrincipal,
+	getAuthCookie,
+	parseCookies,
+} from "./cookie.js";
 import type { ClientPrincipal } from "./types.js";
 
 const principal: ClientPrincipal = {
@@ -21,7 +28,11 @@ describe("parseCookies", () => {
 	});
 
 	it("parses multiple cookies", () => {
-		expect(parseCookies("a=1; b=2; c=3")).toStrictEqual({ a: "1", b: "2", c: "3" });
+		expect(parseCookies("a=1; b=2; c=3")).toStrictEqual({
+			a: "1",
+			b: "2",
+			c: "3",
+		});
 	});
 
 	it("handles cookie values containing =", () => {
@@ -58,16 +69,25 @@ describe("getAuthCookie", () => {
 
 	it("returns the dev-auth cookie value when present", () => {
 		const value = encodePrincipal(principal);
-		expect(getAuthCookie(`${DEV_AUTH_COOKIE_NAME}=${value}; other=x`, DEV_AUTH_COOKIE_NAME)).toBe(value);
+		expect(
+			getAuthCookie(
+				`${DEV_AUTH_COOKIE_NAME}=${value}; other=x`,
+				DEV_AUTH_COOKIE_NAME,
+			),
+		).toBe(value);
 	});
 
 	it("returns the SWA cookie value when using SWA cookie name", () => {
 		const value = encodePrincipal(principal);
-		expect(getAuthCookie(`${SWA_COOKIE_NAME}=${value}; other=x`, SWA_COOKIE_NAME)).toBe(value);
+		expect(
+			getAuthCookie(`${SWA_COOKIE_NAME}=${value}; other=x`, SWA_COOKIE_NAME),
+		).toBe(value);
 	});
 
 	it("does not return SWA cookie when looking for dev-auth cookie", () => {
 		const value = encodePrincipal(principal);
-		expect(getAuthCookie(`${SWA_COOKIE_NAME}=${value}`, DEV_AUTH_COOKIE_NAME)).toBeUndefined();
+		expect(
+			getAuthCookie(`${SWA_COOKIE_NAME}=${value}`, DEV_AUTH_COOKIE_NAME),
+		).toBeUndefined();
 	});
 });

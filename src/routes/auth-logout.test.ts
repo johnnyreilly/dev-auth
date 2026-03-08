@@ -41,7 +41,9 @@ describe("handleLogout", () => {
 	it("clears the auth cookie", () => {
 		const { req, res, headers } = makeReqRes("/.auth/logout");
 		handleLogout(req, res, DEV_AUTH_COOKIE_NAME);
-		expect(String(headers["Set-Cookie"])).toContain(`${DEV_AUTH_COOKIE_NAME}=;`);
+		expect(String(headers["Set-Cookie"])).toContain(
+			`${DEV_AUTH_COOKIE_NAME}=;`,
+		);
 		expect(String(headers["Set-Cookie"])).toContain("Expires=Thu, 01 Jan 1970");
 	});
 });

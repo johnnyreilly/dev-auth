@@ -15,7 +15,9 @@ const principal: ClientPrincipal = {
 };
 
 function makeReqRes(cookieHeader?: string) {
-	const req = { headers: { cookie: cookieHeader } } as unknown as IncomingMessage;
+	const req = {
+		headers: { cookie: cookieHeader },
+	} as unknown as IncomingMessage;
 	const headers: Record<string, unknown> = {};
 	let body = "";
 	const res = {
@@ -38,13 +40,17 @@ describe("handleMe", () => {
 
 	it("returns decoded principal when cookie is present", () => {
 		const cookieValue = encodePrincipal(principal);
-		const { req, res, getBody } = makeReqRes(`${DEV_AUTH_COOKIE_NAME}=${cookieValue}`);
+		const { req, res, getBody } = makeReqRes(
+			`${DEV_AUTH_COOKIE_NAME}=${cookieValue}`,
+		);
 		handleMe(req, res, DEV_AUTH_COOKIE_NAME);
 		expect(JSON.parse(getBody())).toStrictEqual({ clientPrincipal: principal });
 	});
 
 	it("returns null for a corrupt cookie", () => {
-		const { req, res, getBody } = makeReqRes(`${DEV_AUTH_COOKIE_NAME}=!!!notbase64`);
+		const { req, res, getBody } = makeReqRes(
+			`${DEV_AUTH_COOKIE_NAME}=!!!notbase64`,
+		);
 		handleMe(req, res, DEV_AUTH_COOKIE_NAME);
 		expect(JSON.parse(getBody())).toStrictEqual({ clientPrincipal: null });
 	});
