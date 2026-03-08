@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawn } from "node:child_process";
 import { parseArgs } from "node:util";
+import { pathToFileURL } from "node:url";
 
 import { DEV_AUTH_COOKIE_NAME, SWA_COOKIE_NAME } from "./cookie.js";
 import { startServer } from "./server.js";
@@ -152,7 +153,9 @@ async function main(): Promise<void> {
 	startServer(config);
 }
 
-main().catch((err: unknown) => {
-	console.error(err);
-	process.exit(1);
-});
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+	main().catch((err: unknown) => {
+		console.error(err);
+		process.exit(1);
+	});
+}
