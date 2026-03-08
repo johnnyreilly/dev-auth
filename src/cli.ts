@@ -113,6 +113,14 @@ if (!backend) {
 	process.exit(1);
 }
 
+{
+	const result = validateBackendUrl(backend);
+	if (!result.ok) {
+		console.error(result.message);
+		process.exit(1);
+	}
+}
+
 const config: Config = {
 	backend,
 	port,
