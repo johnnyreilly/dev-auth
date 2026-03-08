@@ -6,8 +6,9 @@ import { parseArgs } from "node:util";
 
 import { DEV_AUTH_COOKIE_NAME, SWA_COOKIE_NAME } from "./cookie.js";
 import { startServer } from "./server.js";
-import { waitForBackend } from "./wait-for-backend.js";
 import type { Config, DefaultUser } from "./types.js";
+import { validateBackendUrl } from "./validate-backend-url.js";
+import { waitForBackend } from "./wait-for-backend.js";
 
 const HELP = `
   Usage
@@ -126,6 +127,14 @@ if (!backend) {
 			'Use --backend <url> (or -D / --app-devserver-url) or set "backend" in dev-auth.json.',
 	);
 	process.exit(1);
+}
+
+{
+	const result = validateBackendUrl(backend);
+	if (!result.ok) {
+		console.error(result.message);
+		process.exit(1);
+	}
 }
 
 const config: Config = {
