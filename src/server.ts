@@ -12,6 +12,19 @@ import type { Config } from "./types.js";
 
 const LOGIN_PATH_RE = /^\/.auth\/login\/([^/?]+)/;
 
+function injectPrincipalHeader(
+	req: { headers: Record<string, string | string[] | undefined> },
+	cookieName: string,
+): void {
+	const cookieValue = getAuthCookie(
+		req.headers.cookie as string | undefined,
+		cookieName,
+	);
+	if (cookieValue) {
+		req.headers["x-ms-client-principal"] = cookieValue;
+	}
+}
+
 export function startServer(config: Config): void {
 	const proxy = createProxyServer({ changeOrigin: true });
 
@@ -43,19 +56,12 @@ export function startServer(config: Config): void {
 		}
 
 		// Inject x-ms-client-principal header before proxying
-		const cookieValue = getAuthCookie(req.headers.cookie, config.cookieName);
-		if (cookieValue) {
-			req.headers["x-ms-client-principal"] = cookieValue;
-		}
-
+		injectPrincipalHeader(req, config.cookieName);
 		void proxy.web(req, res, { target: config.backend });
 	});
 
 	server.on("upgrade", (req, socket, head) => {
-		const cookieValue = getAuthCookie(req.headers.cookie, config.cookieName);
-		if (cookieValue) {
-			req.headers["x-ms-client-principal"] = cookieValue;
-		}
+		injectPrincipalHeader(req, config.cookieName);
 		void proxy.ws(req, socket as net.Socket, { target: config.backend }, head);
 	});
 

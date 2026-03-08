@@ -6,9 +6,8 @@ import { parseArgs } from "node:util";
 
 import { DEV_AUTH_COOKIE_NAME, SWA_COOKIE_NAME } from "./cookie.js";
 import { startServer } from "./server.js";
-import type { Config, DefaultUser } from "./types.js";
-import { validateBackendUrl } from "./validate-backend-url.js";
 import { waitForBackend } from "./wait-for-backend.js";
+import type { ClientPrincipal, Config } from "./types.js";
 
 const HELP = `
   Usage
@@ -59,7 +58,7 @@ interface ConfigFile {
 	host?: string;
 	open?: boolean;
 	devserverTimeout?: number;
-	defaultUser?: DefaultUser;
+	defaultUser?: ClientPrincipal;
 }
 
 function loadConfigFile(configPath: string): ConfigFile {
@@ -74,52 +73,37 @@ function loadConfigFile(configPath: string): ConfigFile {
 	}
 }
 
-// config is guaranteed to be set by parseArgs default
+function parseIntOption(
+	raw: string,
+	flag: string,
+	min: number,
+	max = Infinity,
+): number {
+	const n = Number.parseInt(raw, 10);
+	if (!Number.isFinite(n) || n < min || n > max) {
+		console.error(
+			`Error: invalid value "${raw}" for ${flag}; expected an integer between ${String(min)} and ${max < Infinity ? String(max) : "∞"}.`,
+		);
+		process.exit(1);
+	}
+	return n;
+}
+
 const fileConfig = loadConfigFile(values.config);
 
 // --backend and --app-devserver-url / -D are aliases; CLI flags take precedence over config file
 const backend =
 	values.backend ?? values["app-devserver-url"] ?? fileConfig.backend;
-let port: number;
-if (values.port !== undefined) {
-	const parsedPort = Number.parseInt(values.port, 10);
-	if (!Number.isFinite(parsedPort) || parsedPort < 1 || parsedPort > 65535) {
-		console.error(
-			`Error: invalid port "${values.port}". Port must be an integer between 1 and 65535.`,
-		);
-		process.exit(1);
-	}
-	port = parsedPort;
-} else {
-	port = fileConfig.port ?? 4280;
-}
+const port =
+	values.port !== undefined
+		? parseIntOption(values.port, "--port", 1, 65535)
+		: (fileConfig.port ?? 4280);
 const host = values.host ?? fileConfig.host ?? "localhost";
 const openBrowser = values.open || (fileConfig.open ?? false);
-let devserverTimeout: number;
-if (values["devserver-timeout"] !== undefined) {
-	const parsed = parseInt(values["devserver-timeout"], 10);
-	if (!Number.isFinite(parsed) || parsed < 0) {
-		console.error(
-			"Error: invalid value for --devserver-timeout; expected a non-negative integer.",
-		);
-		process.exit(1);
-	}
-	devserverTimeout = parsed;
-} else if (fileConfig.devserverTimeout !== undefined) {
-	if (
-		typeof fileConfig.devserverTimeout !== "number" ||
-		!Number.isFinite(fileConfig.devserverTimeout) ||
-		fileConfig.devserverTimeout < 0
-	) {
-		console.error(
-			'Error: invalid "devserverTimeout" value in config file; expected a non-negative number.',
-		);
-		process.exit(1);
-	}
-	devserverTimeout = fileConfig.devserverTimeout;
-} else {
-	devserverTimeout = 60;
-}
+const devserverTimeout =
+	values["devserver-timeout"] !== undefined
+		? parseIntOption(values["devserver-timeout"], "--devserver-timeout", 0)
+		: (fileConfig.devserverTimeout ?? 60);
 
 if (!backend) {
 	console.error(
@@ -159,12 +143,12 @@ async function main(): Promise<void> {
 		});
 	}
 
-	if (devserverTimeout > 0) {
+	if (config.devserverTimeout > 0) {
 		process.stdout.write(
-			`Waiting for backend at ${config.backend} (timeout: ${String(devserverTimeout)}s)...`,
+			`Waiting for backend at ${config.backend} (timeout: ${String(config.devserverTimeout)}s)...`,
 		);
 		try {
-			await waitForBackend(config.backend, devserverTimeout);
+			await waitForBackend(config.backend, config.devserverTimeout);
 			process.stdout.write(" ready.\n");
 		} catch (err: unknown) {
 			process.stdout.write("\n");
