@@ -11,8 +11,6 @@ export interface ClientPrincipal {
 	claims: Claim[];
 }
 
-export type DefaultUser = ClientPrincipal;
-
 export interface Config {
 	backend: string;
 	port: number;
@@ -20,5 +18,5 @@ export interface Config {
 	open: boolean;
 	devserverTimeout: number;
 	cookieName: string;
-	defaultUser?: DefaultUser;
+	defaultUser?: ClientPrincipal;
 }

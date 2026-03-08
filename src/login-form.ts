@@ -1,9 +1,9 @@
-import type { DefaultUser } from "./types.js";
+import type { ClientPrincipal } from "./types.js";
 
 export function loginFormHtml(
 	provider: string,
 	cookieName: string,
-	defaultUser?: DefaultUser,
+	defaultUser?: ClientPrincipal,
 ): string {
 	const d = defaultUser ?? {
 		identityProvider: provider,
