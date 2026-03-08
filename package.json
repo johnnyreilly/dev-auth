@@ -13,7 +13,7 @@
 	},
 	"type": "module",
 	"bin": {
-		"dev-auth": "./lib/cli.js"
+		"dev-auth": "./lib/start.js"
 	},
 	"files": [
 		"lib/"
