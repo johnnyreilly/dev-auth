@@ -43,7 +43,7 @@ Note: Run `pnpm build` before `pnpm lint` — some lint rules check the built ou
 - `src/wait-for-backend.ts` — polls a URL until it responds or timeout expires
 - `src/cookie.ts` — encode/decode `StaticWebAppsAuthCookie` (plain base64 JSON, no encryption)
 - `src/login-form.ts` — generates the login form HTML; client-side JS sets the cookie on submit
-- `src/types.ts` — `ClientPrincipal`, `Config`, `DefaultUser` interfaces
+- `src/types.ts` — `Claim`, `ClientPrincipal`, `Config` interfaces
 - `src/routes/auth-login.ts` — serves the login form at `/.auth/login/{provider}`
 - `src/routes/auth-me.ts` — returns `{ clientPrincipal }` from cookie at `/.auth/me`
 - `src/routes/auth-logout.ts` — clears the cookie and redirects at `/.auth/logout`
