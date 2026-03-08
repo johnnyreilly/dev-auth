@@ -1,8 +1,7 @@
 <h1 align="center">Dev Auth</h1>
 
 <p align="center">
-	A very lovely package.
-	Hooray!
+	An authentication emulator to be used for local development / testing.  `dev-auth` can be used as a drop in replacement for the <a href="https://azure.github.io/static-web-apps-cli/docs/cli/local-auth"> local authentication option of the Azure Static Web Apps CLI</a>.
 </p>
 
 <p align="center">
@@ -18,43 +17,73 @@
 	<img alt="💪 TypeScript: Strict" src="https://img.shields.io/badge/%F0%9F%92%AA_typescript-strict-21bb42.svg" />
 </p>
 
+## What it does
+
+`dev-auth` is a drop-in replacement for the auth layer of the [Azure Static Web Apps CLI](https://azure.github.io/static-web-apps-cli/). It handles the `/.auth/*` routes locally and reverse-proxies all other traffic to your app's dev server — without pulling in the full SWA CLI.
+
+- `GET /.auth/login/{provider}` — serves a login form where you set a fake user identity
+- `GET /.auth/me` — returns the current user as `{ clientPrincipal }` JSON
+- `GET /.auth/logout` — clears the auth cookie and redirects
+- All other requests — proxied to your backend, with the `x-ms-client-principal` header injected
+
 ## Usage
 
 ```shell
-npm i dev-auth
+pnpm add -D dev-auth
 ```
 
-```ts
-import { greet } from "dev-auth";
+Point it at your running dev server:
 
-greet("Hello, world! 💖");
+```shell
+dev-auth --backend http://localhost:3000
+```
+
+Or use the SWA CLI-compatible flag:
+
+```shell
+dev-auth --swa -D http://localhost:5173
+```
+
+Optionally launch your dev server and wait for it to be ready before starting:
+
+```shell
+dev-auth --run "npm start" --backend http://localhost:3000 --devserver-timeout 30
+```
+
+### Options
+
+| Flag | Alias | Default | Description |
+|------|-------|---------|-------------|
+| `--backend` | `-b`, `--app-devserver-url`, `-D` | — | Backend URL to proxy to (required) |
+| `--port` | `-p` | `4280` | Port to listen on |
+| `--host` | `-q` | `localhost` | Host address to bind to |
+| `--open` | `-o` | `false` | Open browser on startup |
+| `--run` | `-r` | — | Shell command to spawn at startup |
+| `--devserver-timeout` | `-t` | `60` | Seconds to wait for backend to be ready |
+| `--swa` | | `false` | Use `StaticWebAppsAuthCookie` (default: `dev-auth-cookie`) |
+| `--config` | `-c` | `dev-auth.json` | Path to config file |
+
+### Config file
+
+Options can also be set in `dev-auth.json` at the project root. CLI flags take precedence.
+
+```json
+{
+  "backend": "http://localhost:3000",
+  "port": 4280,
+  "defaultUser": {
+    "identityProvider": "aad",
+    "userId": "a3c9a2c0-0000-0000-0000-000000000000",
+    "userDetails": "user@example.com",
+    "userRoles": ["anonymous", "authenticated"],
+    "claims": []
+  }
+}
 ```
 
 ## Development
 
 See [`.github/CONTRIBUTING.md`](./.github/CONTRIBUTING.md), then [`.github/DEVELOPMENT.md`](./.github/DEVELOPMENT.md).
 Thanks! 💖
-
-## Contributors
-
-<!-- spellchecker: disable -->
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tbody>
-    <tr>
-      <td align="center"><a href="https://johnnyreilly.com/"><img src="https://avatars.githubusercontent.com/u/1010525?v=4?s=100" width="100px;" alt="John Reilly"/><br /><sub><b>John Reilly</b></sub></a><br /><a href="https://github.com/johnnyreilly/dev-auth/commits?author=johnnyreilly" title="Code">💻</a> <a href="#content-johnnyreilly" title="Content">🖋</a> <a href="https://github.com/johnnyreilly/dev-auth/commits?author=johnnyreilly" title="Documentation">📖</a> <a href="#ideas-johnnyreilly" title="Ideas, Planning, & Feedback">🤔</a> <a href="#infra-johnnyreilly" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-johnnyreilly" title="Maintenance">🚧</a> <a href="#projectManagement-johnnyreilly" title="Project Management">📆</a> <a href="#tool-johnnyreilly" title="Tools">🔧</a></td>
-    </tr>
-  </tbody>
-</table>
-
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
-
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-<!-- spellchecker: enable -->
-
-<!-- You can remove this notice if you don't want it 🙂 no worries! -->
 
 > 💝 This package was templated with [`create-typescript-app`](https://github.com/JoshuaKGoldberg/create-typescript-app) using the [Bingo framework](https://create.bingo).
