@@ -114,6 +114,29 @@ export async function main(): Promise<void> {
 		process.exit(1);
 	}
 
+	// Validate backend URL early so we can fail with a clear, actionable message.
+	let parsedBackendUrl: URL;
+	try {
+		parsedBackendUrl = new URL(backend);
+	} catch {
+		console.error(
+			`Error: invalid backend URL "${backend}".\n` +
+				'Ensure it is a valid URL, including the scheme, e.g. "http://localhost:3000".',
+		);
+		process.exit(1);
+	}
+
+	if (
+		parsedBackendUrl.protocol !== "http:" &&
+		parsedBackendUrl.protocol !== "https:"
+	) {
+		console.error(
+			`Error: unsupported backend URL protocol "${parsedBackendUrl.protocol}".\n` +
+				'Use an "http://" or "https://" URL for --backend (or -D / --app-devserver-url).',
+		);
+		process.exit(1);
+	}
+
 	const config: Config = {
 		backend,
 		port,
