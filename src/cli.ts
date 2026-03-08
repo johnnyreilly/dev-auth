@@ -98,10 +98,31 @@ if (values.port !== undefined) {
 }
 const host = values.host ?? fileConfig.host ?? "localhost";
 const openBrowser = values.open || (fileConfig.open ?? false);
-const devserverTimeout =
-	values["devserver-timeout"] !== undefined
-		? parseInt(values["devserver-timeout"], 10)
-		: (fileConfig.devserverTimeout ?? 60);
+let devserverTimeout: number;
+if (values["devserver-timeout"] !== undefined) {
+	const parsed = parseInt(values["devserver-timeout"], 10);
+	if (!Number.isFinite(parsed) || parsed < 0) {
+		console.error(
+			'Error: invalid value for --devserver-timeout; expected a non-negative integer.',
+		);
+		process.exit(1);
+	}
+	devserverTimeout = parsed;
+} else if (fileConfig.devserverTimeout !== undefined) {
+	if (
+		typeof fileConfig.devserverTimeout !== "number" ||
+		!Number.isFinite(fileConfig.devserverTimeout) ||
+		fileConfig.devserverTimeout < 0
+	) {
+		console.error(
+			'Error: invalid "devserverTimeout" value in config file; expected a non-negative number.',
+		);
+		process.exit(1);
+	}
+	devserverTimeout = fileConfig.devserverTimeout;
+} else {
+	devserverTimeout = 60;
+}
 
 if (!backend) {
 	console.error(
