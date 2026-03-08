@@ -52,16 +52,16 @@ dev-auth --run "npm start" --backend http://localhost:3000 --devserver-timeout 3
 
 ### Options
 
-| Flag | Alias | Default | Description |
-|------|-------|---------|-------------|
-| `--backend` | `-b`, `--app-devserver-url`, `-D` | — | Backend URL to proxy to (required) |
-| `--port` | `-p` | `4280` | Port to listen on |
-| `--host` | `-q` | `localhost` | Host address to bind to |
-| `--open` | `-o` | `false` | Open browser on startup |
-| `--run` | `-r` | — | Shell command to spawn at startup |
-| `--devserver-timeout` | `-t` | `60` | Seconds to wait for backend to be ready |
-| `--swa` | | `false` | Use `StaticWebAppsAuthCookie` (default: `dev-auth-cookie`) |
-| `--config` | `-c` | `dev-auth.json` | Path to config file |
+| Flag                  | Alias                             | Default         | Description                                                |
+| --------------------- | --------------------------------- | --------------- | ---------------------------------------------------------- |
+| `--backend`           | `-b`, `--app-devserver-url`, `-D` | —               | Backend URL to proxy to (required)                         |
+| `--port`              | `-p`                              | `4280`          | Port to listen on                                          |
+| `--host`              | `-q`                              | `localhost`     | Host address to bind to                                    |
+| `--open`              | `-o`                              | `false`         | Open browser on startup                                    |
+| `--run`               | `-r`                              | —               | Shell command to spawn at startup                          |
+| `--devserver-timeout` | `-t`                              | `60`            | Seconds to wait for backend to be ready                    |
+| `--swa`               |                                   | `false`         | Use `StaticWebAppsAuthCookie` (default: `dev-auth-cookie`) |
+| `--config`            | `-c`                              | `dev-auth.json` | Path to config file                                        |
 
 ### Config file
 
@@ -69,15 +69,15 @@ Options can also be set in `dev-auth.json` at the project root. CLI flags take p
 
 ```json
 {
-  "backend": "http://localhost:3000",
-  "port": 4280,
-  "defaultUser": {
-    "identityProvider": "aad",
-    "userId": "a3c9a2c0-0000-0000-0000-000000000000",
-    "userDetails": "user@example.com",
-    "userRoles": ["anonymous", "authenticated"],
-    "claims": []
-  }
+	"backend": "http://localhost:3000",
+	"port": 4280,
+	"defaultUser": {
+		"identityProvider": "aad",
+		"userId": "a3c9a2c0-0000-0000-0000-000000000000",
+		"userDetails": "user@example.com",
+		"userRoles": ["anonymous", "authenticated"],
+		"claims": []
+	}
 }
 ```
 
