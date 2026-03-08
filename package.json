@@ -15,7 +15,6 @@
 	"bin": {
 		"dev-auth": "./lib/cli.js"
 	},
-	"main": "./lib/cli.js",
 	"files": [
 		"lib/"
 	],
