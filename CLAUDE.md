@@ -51,7 +51,7 @@ Note: Run `pnpm build` before `pnpm lint` — some lint rules check the built ou
 ### Auth flow
 
 1. `GET /.auth/login/{provider}` → server renders HTML form (pre-filled from `defaultUser` in config)
-2. User submits form → browser JS encodes principal as `btoa(JSON.stringify(...))` and sets `StaticWebAppsAuthCookie`
+2. User submits form → browser JS encodes principal as `btoa(JSON.stringify(...))` and sets the cookie named `cookieName` (defaults to `dev-auth-cookie`; use `--swa` to switch to `StaticWebAppsAuthCookie`)
 3. `GET /.auth/me` → server reads cookie, base64-decodes, returns `{ clientPrincipal }`
 4. All other requests → proxied to `--backend` URL; `x-ms-client-principal` header injected (same base64 value as cookie)
 5. `GET /.auth/logout` → cookie cleared, redirect to `post_logout_redirect_uri` or `/`
@@ -69,6 +69,7 @@ All flags can also be set in `dev-auth.json`. CLI flags override config file val
 | `--run`               | `-r`                              | —               | Shell command to spawn at startup       |
 | `--devserver-timeout` | `-t`                              | `60`            | Seconds to wait for backend to be ready |
 | `--config`            | `-c`                              | `dev-auth.json` | Path to config file                     |
+| `--swa`               |                                   | `false`         | Use `StaticWebAppsAuthCookie` instead of `dev-auth-cookie` |
 
 ### Config file (`dev-auth.json`)
 
