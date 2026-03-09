@@ -38,10 +38,10 @@ Note: Run `pnpm build` before `pnpm lint` — some lint rules check the built ou
 
 ### Key files
 
-- `src/cli.ts` — CLI entry point; parses flags with Node's `parseArgs` (`node:util`), loads `dev-auth.json`, optionally spawns `--run` subprocess, waits for backend, calls `startServer()`
+- `src/cli.ts` — CLI entry point; parses flags with Node's `parseArgs` (`node:util`), loads config file (`dev-auth.config.json` by default, `swa-cli.config.json` in `--swa` mode), optionally spawns `--run` subprocess, waits for backend, calls `startServer()`
 - `src/server.ts` — `http.createServer()` router; delegates to route handlers or proxies via `httpxy`; opens browser if `--open`
 - `src/wait-for-backend.ts` — polls a URL until it responds or timeout expires
-- `src/cookie.ts` — encode/decode `StaticWebAppsAuthCookie` (plain base64 JSON, no encryption)
+- `src/cookie.ts` — encode/decode the auth cookie (plain base64 JSON, no encryption); exports `DEV_AUTH_COOKIE_NAME` and `SWA_COOKIE_NAME`
 - `src/login-form.ts` — generates the login form HTML; client-side JS sets the cookie on submit
 - `src/types.ts` — `Claim`, `ClientPrincipal`, `Config` interfaces
 - `src/routes/auth-login.ts` — serves the login form at `/.auth/login/{provider}`
@@ -50,44 +50,48 @@ Note: Run `pnpm build` before `pnpm lint` — some lint rules check the built ou
 
 ### Auth flow
 
-1. `GET /.auth/login/{provider}` → server renders HTML form (pre-filled from `defaultUser` in config)
-2. User submits form → browser JS encodes principal as `btoa(JSON.stringify(...))` and sets `StaticWebAppsAuthCookie`
+1. `GET /.auth/login/{provider}` → server renders HTML form
+2. User submits form → browser JS encodes principal as `btoa(JSON.stringify(...))` and sets the auth cookie (`dev-auth-cookie` by default, `StaticWebAppsAuthCookie` with `--swa`)
 3. `GET /.auth/me` → server reads cookie, base64-decodes, returns `{ clientPrincipal }`
 4. All other requests → proxied to `--backend` URL; `x-ms-client-principal` header injected (same base64 value as cookie)
 5. `GET /.auth/logout` → cookie cleared, redirect to `post_logout_redirect_uri` or `/`
 
 ### CLI flags
 
-All flags can also be set in `dev-auth.json`. CLI flags override config file values.
+CLI flags override values from the config file.
 
-| Flag                  | Alias                             | Default         | Description                             |
-| --------------------- | --------------------------------- | --------------- | --------------------------------------- |
-| `--backend`           | `-b`, `--app-devserver-url`, `-D` | —               | Backend URL to proxy to (required)      |
-| `--port`              | `-p`                              | `4280`          | Port to listen on                       |
-| `--host`              | `-q`                              | `localhost`     | Host address to bind to                 |
-| `--open`              | `-o`                              | `false`         | Open browser on startup                 |
-| `--run`               | `-r`                              | —               | Shell command to spawn at startup       |
-| `--devserver-timeout` | `-t`                              | `60`            | Seconds to wait for backend to be ready |
-| `--config`            | `-c`                              | `dev-auth.json` | Path to config file                     |
+| Flag                  | Alias                             | Default                                                        | Description                                                                                           |
+| --------------------- | --------------------------------- | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `--backend`           | `-b`, `--app-devserver-url`, `-D` | —                                                              | Backend URL to proxy to (required)                                                                    |
+| `--port`              | `-p`                              | `4280`                                                         | Port to listen on                                                                                     |
+| `--host`              | `-q`                              | `localhost`                                                    | Host address to bind to                                                                               |
+| `--open`              | `-o`                              | `false`                                                        | Open browser on startup                                                                               |
+| `--run`               | `-r`                              | —                                                              | Shell command to spawn at startup                                                                     |
+| `--devserver-timeout` | `-t`                              | `60`                                                           | Seconds to wait for backend to be ready                                                               |
+| `--config`            | `-c`                              | `dev-auth.config.json` (or `swa-cli.config.json` with `--swa`) | Path to config file                                                                                   |
+| `--config-name`       | `-n`                              | —                                                              | Named configuration to use from the config file                                                       |
+| `--swa`               |                                   | `false`                                                        | SWA CLI compatibility mode: use `StaticWebAppsAuthCookie` and default config to `swa-cli.config.json` |
 
-### Config file (`dev-auth.json`)
+### Config file format
+
+Both `dev-auth.config.json` (default) and `swa-cli.config.json` (`--swa` mode) use the same format:
 
 ```json
 {
-	"backend": "http://localhost:3000",
-	"port": 4280,
-	"host": "localhost",
-	"open": false,
-	"devserverTimeout": 60,
-	"defaultUser": {
-		"identityProvider": "aad",
-		"userId": "a3c9a2c0-0000-0000-0000-000000000000",
-		"userDetails": "user@example.com",
-		"userRoles": ["anonymous", "authenticated"],
-		"claims": []
+	"configurations": {
+		"app": {
+			"appDevserverUrl": "http://localhost:3000",
+			"port": 4280,
+			"host": "localhost",
+			"open": false,
+			"run": "npm start",
+			"devserverTimeout": 60
+		}
 	}
 }
 ```
+
+If the file has multiple configurations, use `--config-name` to select one; otherwise the first entry is used with a warning. Missing files are silently ignored.
 
 ## Key Constraints
 

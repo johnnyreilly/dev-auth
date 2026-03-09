@@ -1,16 +1,10 @@
-import type { ClientPrincipal } from "./types.js";
-
-export function loginFormHtml(
-	provider: string,
-	cookieName: string,
-	defaultUser?: ClientPrincipal,
-): string {
-	const d: ClientPrincipal = {
-		identityProvider: defaultUser?.identityProvider ?? provider,
-		userId: defaultUser?.userId ?? crypto.randomUUID(),
-		userDetails: defaultUser?.userDetails ?? "",
-		userRoles: defaultUser?.userRoles ?? ["anonymous", "authenticated"],
-		claims: defaultUser?.claims ?? [],
+export function loginFormHtml(provider: string, cookieName: string): string {
+	const d = {
+		identityProvider: provider,
+		userId: crypto.randomUUID(),
+		userDetails: "",
+		userRoles: ["anonymous", "authenticated"],
+		claims: [] as unknown[],
 	};
 
 	const rolesValue = d.userRoles.join("\n");

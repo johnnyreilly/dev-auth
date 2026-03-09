@@ -18,5 +18,4 @@ export interface Config {
 	open: boolean;
 	devserverTimeout: number;
 	cookieName: string;
-	defaultUser?: ClientPrincipal;
 }

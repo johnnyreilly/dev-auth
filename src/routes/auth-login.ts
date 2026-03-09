@@ -9,7 +9,7 @@ export function handleLogin(
 	provider: string,
 	config: Config,
 ): void {
-	const html = loginFormHtml(provider, config.cookieName, config.defaultUser);
+	const html = loginFormHtml(provider, config.cookieName);
 	res.writeHead(200, {
 		"Content-Type": "text/html; charset=utf-8",
 		"Content-Length": Buffer.byteLength(html),

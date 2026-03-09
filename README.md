@@ -52,33 +52,66 @@ dev-auth --run "npm start" --backend http://localhost:3000 --devserver-timeout 3
 
 ### Options
 
-| Flag                  | Alias                             | Default         | Description                                                |
-| --------------------- | --------------------------------- | --------------- | ---------------------------------------------------------- |
-| `--backend`           | `-b`, `--app-devserver-url`, `-D` | —               | Backend URL to proxy to (required)                         |
-| `--port`              | `-p`                              | `4280`          | Port to listen on                                          |
-| `--host`              | `-q`                              | `localhost`     | Host address to bind to                                    |
-| `--open`              | `-o`                              | `false`         | Open browser on startup                                    |
-| `--run`               | `-r`                              | —               | Shell command to spawn at startup                          |
-| `--devserver-timeout` | `-t`                              | `60`            | Seconds to wait for backend to be ready                    |
-| `--swa`               |                                   | `false`         | Use `StaticWebAppsAuthCookie` (default: `dev-auth-cookie`) |
-| `--config`            | `-c`                              | `dev-auth.json` | Path to config file                                        |
+| Flag                  | Alias                             | Default                | Description                                                                                           |
+| --------------------- | --------------------------------- | ---------------------- | ----------------------------------------------------------------------------------------------------- |
+| `--backend`           | `-b`, `--app-devserver-url`, `-D` | —                      | Backend URL to proxy to (required)                                                                    |
+| `--port`              | `-p`                              | `4280`                 | Port to listen on                                                                                     |
+| `--host`              | `-q`                              | `localhost`            | Host address to bind to                                                                               |
+| `--open`              | `-o`                              | `false`                | Open browser on startup                                                                               |
+| `--run`               | `-r`                              | —                      | Shell command to spawn at startup                                                                     |
+| `--devserver-timeout` | `-t`                              | `60`                   | Seconds to wait for backend to be ready                                                               |
+| `--config`            | `-c`                              | `dev-auth.config.json` | Path to config file                                                                                   |
+| `--config-name`       | `-n`                              | —                      | Named configuration to use from the config file                                                       |
+| `--swa`               |                                   | `false`                | SWA CLI compatibility mode: use `StaticWebAppsAuthCookie` and default config to `swa-cli.config.json` |
 
 ### Config file
 
-Options can also be set in `dev-auth.json` at the project root. CLI flags take precedence.
+Options can also be set in a config file. CLI flags take precedence. The default config file is `dev-auth.config.json`; in `--swa` mode it is `swa-cli.config.json`. Both use the same format:
 
 ```json
 {
-	"backend": "http://localhost:3000",
-	"port": 4280,
-	"defaultUser": {
-		"identityProvider": "aad",
-		"userId": "a3c9a2c0-0000-0000-0000-000000000000",
-		"userDetails": "user@example.com",
-		"userRoles": ["anonymous", "authenticated"],
-		"claims": []
+	"configurations": {
+		"app": {
+			"appDevserverUrl": "http://localhost:3000",
+			"port": 4280,
+			"run": "npm start"
+		}
 	}
 }
+```
+
+If the file contains multiple named configurations, pass `--config-name` to select one.
+
+## Migrating from the SWA CLI
+
+If you currently use `swa start` for local auth, replace it with `dev-auth --swa`. The `--swa` flag enables Static Web Apps CLI compatibility mode:
+
+- Uses `StaticWebAppsAuthCookie` (the same cookie name SWA uses)
+- Reads your existing `swa-cli.config.json` automatically
+
+**Before:**
+
+```shell
+swa start --app-devserver-url http://localhost:3000
+```
+
+**After:**
+
+```shell
+dev-auth --swa --app-devserver-url http://localhost:3000
+```
+
+If your config is in `swa-cli.config.json`, you don't need to pass any flags at all — just run:
+
+```diff
+-swa start
++dev-auth --swa
+```
+
+And if you have multiple named configurations in the file:
+
+```shell
+dev-auth --swa --config-name app
 ```
 
 ## Development
